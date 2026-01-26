@@ -14,6 +14,12 @@ class App {
         this.selectedCluster = null;
         this.currentCompetency = null;
         this.isRendering = false;
+
+        // Stable handlers to avoid re-binding on each render
+        this.onBlockClick = this.onBlockClick.bind(this);
+        this.onClusterClick = this.onClusterClick.bind(this);
+        this.onCompetencyClick = this.onCompetencyClick.bind(this);
+        this.onLevelSwitchClick = this.onLevelSwitchClick.bind(this);
     }
 
     async init() {
@@ -283,27 +289,10 @@ class App {
             </div>
         `;
 
-        // Add click handlers
-        blocksContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('.block-btn');
-            if (btn) {
-                const blockId = btn.dataset.blockId;
-                this.selectedBlock = blockId;
-                sessionStorage.setItem('selectedBlockId', blockId);
-                
-                // Update active state
-                blocksContainer.querySelectorAll('.block-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Reset cluster selection
-                this.selectedCluster = null;
-                sessionStorage.removeItem('selectedClusterId');
-                
-                // Re-render clusters and competencies
-                this.renderClusters(categoryId);
-                this.renderCompetencies(categoryId);
-            }
-        });
+        if (!blocksContainer.dataset.bound) {
+            blocksContainer.addEventListener('click', this.onBlockClick);
+            blocksContainer.dataset.bound = '1';
+        }
 
         // Set first block as active if none selected
         if (!this.selectedBlock && blocks.length > 0) {
@@ -368,6 +357,16 @@ class App {
         renderClusterList(container);
         renderClusterList(detailContainer);
 
+        if (!container?.dataset.bound) {
+            container.addEventListener('click', this.onClusterClick);
+            container.dataset.bound = '1';
+        }
+
+        if (!detailContainer?.dataset.bound) {
+            detailContainer.addEventListener('click', this.onClusterClick);
+            detailContainer.dataset.bound = '1';
+        }
+
         if (detailContainer) {
             if (detailMode) {
                 detailContainer.classList.add('clusters-sidebar-compact');
@@ -425,19 +424,10 @@ class App {
         }).join('');
 
         // Add click handlers - use event delegation
-        container.addEventListener('click', (e) => {
-            const card = e.target.closest('.competency-card');
-            if (card) {
-                const competencyId = card.dataset.competencyId;
-                if (competencyId) {
-                    if (DEBUG) console.log('[App] Competency clicked:', competencyId);
-                    this.router.navigate('competency', { 
-                        key: competencyId,
-                        categoryId 
-                    });
-                }
-            }
-        });
+        if (!container.dataset.bound) {
+            container.addEventListener('click', this.onCompetencyClick);
+            container.dataset.bound = '1';
+        }
     }
 
     async renderCompetencyDetails(competencyKey, categoryId, level = null) {
@@ -537,28 +527,10 @@ class App {
             </button>
         `).join('');
 
-        // Add click handlers
-        container.addEventListener('click', (e) => {
-            const btn = e.target.closest('.level-switch-btn');
-            if (btn) {
-                const level = parseInt(btn.dataset.level);
-                
-                // Update active state
-                container.querySelectorAll('.level-switch-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Update URL without triggering full re-render
-                const params = this.router.getParams();
-                this.router.navigate('competency', {
-                    key: competencyId,
-                    level: level.toString(),
-                    categoryId: params.categoryId || this.selectedCategory
-                });
-                
-                // Render content for selected level
-                this.renderLevelContent(competencyId, level);
-            }
-        });
+        if (!container.dataset.bound) {
+            container.addEventListener('click', this.onLevelSwitchClick);
+            container.dataset.bound = '1';
+        }
     }
 
     renderLevelContent(competencyId, level) {
@@ -722,6 +694,91 @@ class App {
 
     showError(message) {
         alert(message);
+    }
+
+    onBlockClick(e) {
+        const btn = e.target.closest('.block-btn');
+        if (!btn) return;
+        const blockId = btn.dataset.blockId;
+        if (!blockId) return;
+
+        this.selectedBlock = blockId;
+        sessionStorage.setItem('selectedBlockId', blockId);
+
+        // Update active state
+        const blocksContainer = document.getElementById('blocks-selector');
+        blocksContainer?.querySelectorAll('.block-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Reset cluster selection
+        this.selectedCluster = null;
+        sessionStorage.removeItem('selectedClusterId');
+
+        // Re-render clusters and competencies
+        this.renderClusters(this.selectedCategory);
+        this.renderCompetencies(this.selectedCategory);
+    }
+
+    onClusterClick(e) {
+        const item = e.target.closest('.cluster-item');
+        if (!item) return;
+        const clusterId = item.dataset.clusterId;
+        if (!clusterId) return;
+
+        this.selectedCluster = clusterId;
+        sessionStorage.setItem('selectedClusterId', clusterId);
+
+        // Update active state for both lists
+        document.querySelectorAll('.cluster-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll(`.cluster-item[data-cluster-id="${clusterId}"]`).forEach(i => i.classList.add('active'));
+
+        const filteredClusters = this.dataManager.getClusters().filter(c => !this.selectedBlock || c.block_id === this.selectedBlock);
+        const clusterName = filteredClusters.find(c => c.id === clusterId)?.name || '';
+
+        const clusterTitle = document.getElementById('cluster-title');
+        if (clusterTitle) {
+            clusterTitle.textContent = `Компетенции кластера «${clusterName}»`;
+        }
+
+        // Re-render competencies
+        this.renderCompetencies(this.selectedCategory);
+    }
+
+    onCompetencyClick(e) {
+        const card = e.target.closest('.competency-card');
+        if (!card) return;
+        const competencyId = card.dataset.competencyId;
+        if (!competencyId) return;
+
+        if (DEBUG) console.log('[App] Competency clicked:', competencyId);
+        this.router.navigate('competency', { 
+            key: competencyId,
+            categoryId: this.selectedCategory
+        });
+    }
+
+    onLevelSwitchClick(e) {
+        const container = e.currentTarget;
+        const btn = e.target.closest('.level-switch-btn');
+        if (!btn) return;
+        const level = parseInt(btn.dataset.level);
+        
+        // Update active state
+        container.querySelectorAll('.level-switch-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update URL without triggering full re-render
+        const params = this.router.getParams();
+        this.router.navigate('competency', {
+            key: this.currentCompetency?.id || params.key,
+            level: level.toString(),
+            categoryId: params.categoryId || this.selectedCategory
+        });
+        
+        // Render content for selected level
+        if (this.currentCompetency?.id) {
+            this.renderLevelContent(this.currentCompetency.id, level);
+        }
     }
 }
 
