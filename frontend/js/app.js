@@ -189,6 +189,7 @@ class App {
 
     async renderCategorySelection() {
         if (DEBUG) console.log('[App] Rendering category selection');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         const categories = this.dataManager.getCategories();
         const container = document.getElementById('category-list');
@@ -236,6 +237,7 @@ class App {
 
     async renderModel(categoryId) {
         if (DEBUG) console.log('[App] Rendering model for category:', categoryId);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         const category = this.dataManager.getCategories().find(c => c.id === categoryId);
         if (!category) {
@@ -432,6 +434,9 @@ class App {
 
     async renderCompetencyDetails(competencyKey, categoryId, level = null) {
         if (DEBUG) console.log('[App] Rendering competency details:', competencyKey, categoryId, level);
+
+        // Ensure view starts from top of the page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         const competency = this.dataManager.getCompetencyById(competencyKey);
         if (!competency) {
