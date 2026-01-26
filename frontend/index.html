@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ШЦР · Цифровые компетенции</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Screen 1: Category Selection -->
+        <div id="screen-category" class="screen active">
+            <header class="app-header">
+                <div class="header-content">
+                    <h1 class="app-title">ШЦР · Цифровые компетенции</h1>
+                    <div class="header-logo">
+                        <img src="data/zn_logo.svg" alt="Логотип" />
+                    </div>
+                    <nav class="header-nav">
+                        <button id="btn-glossary" class="nav-link">Словарь</button>
+                        <button id="btn-help" class="nav-link">Помощь</button>
+                    </nav>
+                </div>
+            </header>
+            <div class="container">
+                <h2 class="screen-title">Выберите Категорию</h2>
+                <p class="screen-subtitle">После выбора вы увидите целевые компетенции и действия для развития.</p>
+                <div id="category-list" class="category-list"></div>
+            </div>
+        </div>
+
+        <!-- Screen 2: Competency Model -->
+        <div id="screen-model" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <h1 class="app-title">ШЦР · Цифровые компетенции</h1>
+                    <div class="header-logo">
+                        <img src="data/zn_logo.svg" alt="Логотип" />
+                    </div>
+                    <nav class="header-nav">
+                        <button id="btn-glossary-2" class="nav-link">Словарь</button>
+                        <button id="btn-help-2" class="nav-link">Помощь</button>
+                    </nav>
+                </div>
+            </header>
+            <div class="container">
+                <div class="model-header">
+                    <div class="category-display">
+                        <span class="category-label">Категория:</span>
+                        <span id="current-category-name" class="category-name"></span>
+                    </div>
+                    <button id="btn-change-category" class="btn-change-category">Сменить категорию</button>
+                </div>
+                <div id="blocks-selector" class="blocks-selector"></div>
+                <div class="model-layout">
+                    <aside id="clusters-sidebar" class="clusters-sidebar">
+                        <h3 class="clusters-title">Кластеры</h3>
+                        <ul id="clusters-list" class="clusters-list"></ul>
+                    </aside>
+                    <main id="competencies-area" class="competencies-area">
+                        <div class="competencies-header">
+                            <h3 id="cluster-title" class="cluster-title"></h3>
+                            <p class="competencies-hint">Нажмите на компетенцию, чтобы открыть меню развивающих действий</p>
+                        </div>
+                        <div id="competencies-list" class="competencies-list"></div>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Competency Details -->
+        <div id="screen-competency" class="screen">
+            <header class="app-header">
+                <div class="header-content">
+                    <h1 class="app-title">ШЦР · Цифровые компетенции</h1>
+                    <div class="header-logo">
+                        <img src="data/zn_logo.svg" alt="Логотип" />
+                    </div>
+                    <nav class="header-nav">
+                        <button id="btn-glossary-3" class="nav-link">Словарь</button>
+                        <button id="btn-help-3" class="nav-link">Помощь</button>
+                    </nav>
+                </div>
+            </header>
+            <div class="container">
+                <div class="breadcrumbs" id="breadcrumbs"></div>
+                <div class="competency-header-detail">
+                    <button id="btn-change-category-2" class="btn-change-category">Сменить категорию</button>
+                </div>
+                <div class="competency-details-layout">
+                    <aside id="clusters-sidebar-detail" class="clusters-sidebar">
+                        <h3 class="clusters-title">Кластеры</h3>
+                        <ul id="clusters-list-detail" class="clusters-list"></ul>
+                    </aside>
+                    <main class="competency-details-main">
+                        <h2 id="competency-title" class="competency-title-main"></h2>
+                        <div class="competency-info-bar">
+                            <div class="target-level-display">
+                                <span class="target-level-label">Целевой уровень:</span>
+                                <span id="target-level-badge" class="target-level-badge"></span>
+                            </div>
+                            <div class="level-switch">
+                                <button class="level-switch-btn" data-level="1">1</button>
+                                <button class="level-switch-btn" data-level="2">2</button>
+                                <button class="level-switch-btn active" data-level="3">3</button>
+                                <button class="level-switch-btn" data-level="4">4</button>
+                                <button class="level-switch-btn" data-level="5">5</button>
+                            </div>
+                        </div>
+                        <div id="level-description" class="level-description"></div>
+                        <div id="actions-section" class="actions-section">
+                            <div id="actions-content" class="actions-content"></div>
+                        </div>
+                        <button id="btn-back-to-model" class="btn-back-to-model">Вернуться к модели компетенций</button>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glossary Modal -->
+    <div id="modal-glossary" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Словарь терминов</h2>
+                <button class="modal-close" id="btn-close-glossary">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="glossary-search">
+                    <input type="text" id="glossary-search-input" placeholder="Поиск термина..." class="search-input">
+                </div>
+                <div id="glossary-list" class="glossary-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="modal-help" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Помощь</h2>
+                <button class="modal-close" id="btn-close-help">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <h3>Как пользоваться сервисом</h3>
+                    <ul class="help-list">
+                        <li><strong>Выбор категории:</strong> На главном экране выберите одну из 5 категорий персонала. Ваш выбор автоматически сохраняется, и при следующем посещении вы вернетесь к выбранной категории.</li>
+                        <li><strong>Смена категории:</strong> Вы можете изменить категорию в любой момент, нажав кнопку "Сменить категорию" на экране модели компетенций.</li>
+                        <li><strong>Навигация по модели:</strong> Сначала выберите блок компетенций, затем кластер в этом блоке. Справа отобразится сетка компетенций с целевыми уровнями для вашей категории.</li>
+                        <li><strong>Детали компетенции:</strong> Нажмите на компетенцию, чтобы открыть детальную информацию. Вы увидите целевой уровень для вашей категории и сможете переключаться между уровнями 1-5 для просмотра соответствующих развивающих действий.</li>
+                        <li><strong>Развивающие действия:</strong> Действия сгруппированы по методологии 70/20/10: обучение на практике (70%), развитие на рабочем месте (20%), обучение и саморазвитие (10%).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/router.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
