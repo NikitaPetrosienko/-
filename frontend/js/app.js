@@ -589,27 +589,41 @@ class App {
         
         const actions = competency?.actions || {};
         
-        if (!actions.all || actions.all.length === 0) {
+        const byLevel = actions.by_level || {};
+        const hasAnyActions = (actions.all && actions.all.length > 0) || Object.keys(byLevel).length > 0;
+        if (!hasAnyActions) {
             container.innerHTML = '<div class="empty-state"><p>Развивающие действия для данной компетенции отсутствуют</p></div>';
             return;
         }
 
         // Get actions for the selected level
-        const levelActionsRaw = actions.by_level?.[String(level)] || 
-                              actions.by_level?.['all'] || 
-                              actions.all;
+        const levelKey = String(level);
+        const levelActions = Array.isArray(byLevel[levelKey]) ? byLevel[levelKey] : [];
+        const commonActions = Array.isArray(byLevel.all) ? byLevel.all : [];
+        let levelActionsRaw = [...levelActions, ...commonActions];
+        if (levelActionsRaw.length === 0 && Array.isArray(actions.all)) {
+            levelActionsRaw = actions.all;
+        }
 
         // Filter out терминологию/ресурсы, чтобы не показывать их в действиях
-        const levelActions = levelActionsRaw.filter(a => {
+        const levelActionsFiltered = levelActionsRaw.filter(a => {
             const text = (a.text || '').toLowerCase();
             if (text.includes('словарь терминов')) return false;
             if (text.includes('список ресурсов')) return false;
             return true;
         });
+        const seen = new Set();
+        const levelActionsDeduped = [];
+        levelActionsFiltered.forEach(action => {
+            const key = `${action.type || 'other'}::${(action.text || '').trim()}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            levelActionsDeduped.push(action);
+        });
 
         // Group by type
         const byType = { '70': [], '20': [], '10': [], 'other': [] };
-        levelActions.forEach(action => {
+        levelActionsDeduped.forEach(action => {
             const type = action.type || 'other';
             if (byType[type]) {
                 byType[type].push(action);
