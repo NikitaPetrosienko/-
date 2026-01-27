@@ -664,93 +664,93 @@ body {
 }
 
 .actions-content {
-    display: grid;
-    gap: 30px;
-}
-
-.action-group {
-    border-top: 2px solid var(--color-gray-light);
-    padding-top: 25px;
-}
-
-.action-group h4 {
-    font-size: 1.3em;
-    font-weight: 600;
-    color: var(--color-gray-1);
-    margin-bottom: 20px;
-}
-
-.action-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.action-card {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-light);
-    border-radius: 8px;
-    padding: 20px;
-    transition: all 0.2s;
-}
-
-.action-card:hover {
-    border-color: var(--color-blue);
-    box-shadow: 0 2px 8px rgba(0, 103, 178, 0.1);
-}
-
-.action-card-title {
-    font-weight: 600;
-    color: var(--color-gray-1);
-    margin-bottom: 10px;
-    font-size: 1em;
-}
-
-.action-card-description {
-    color: var(--color-gray-2);
-    font-size: 0.9em;
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
-
-.action-card-resource {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-    font-size: 0.85em;
-    color: var(--color-gray-2);
+    flex-direction: column;
+    gap: 16px;
 }
 
-.action-card-resource::before {
-    content: "•";
-    color: var(--color-green-main);
-    font-weight: bold;
-}
-
-.action-card .btn-open {
-    width: 100%;
-    background-color: var(--color-white);
+.action-list {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--color-gray-light);
-    color: var(--color-gray-1);
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: all 0.2s;
-    text-align: center;
 }
 
-.action-card .btn-open:hover {
-    border-color: var(--color-blue);
+.action-list-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.action-list ul {
+    list-style: none;
+    padding: 14px 16px 16px 16px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fff;
+}
+
+.action-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.6;
+    color: var(--color-gray-1);
+}
+
+.action-list li .bullet {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+    border: 2px solid currentColor;
+}
+
+.action-list-70 { border-color: rgba(0, 103, 178, 0.3); }
+.action-list-70 .action-list-header { background: rgba(0, 103, 178, 0.9); }
+.action-list-70 li .bullet { color: var(--color-blue); }
+
+.action-list-20 { border-color: rgba(237, 110, 28, 0.3); }
+.action-list-20 .action-list-header { background: rgba(237, 110, 28, 0.9); }
+.action-list-20 li .bullet { color: var(--color-orange); }
+
+.action-list-10 { border-color: rgba(0, 150, 57, 0.3); }
+.action-list-10 .action-list-header { background: rgba(0, 150, 57, 0.9); }
+.action-list-10 li .bullet { color: var(--color-green-main); }
+
+.action-list-other { border-color: rgba(83, 86, 90, 0.25); }
+.action-list-other .action-list-header { background: rgba(83, 86, 90, 0.9); }
+.action-list-other li .bullet { color: var(--color-gray-1); }
+
+.resources-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-open-resources {
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-light);
     color: var(--color-blue);
-    background-color: rgba(0, 103, 178, 0.05);
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-open-resources:hover {
+    border-color: var(--color-blue);
+    background: rgba(0, 103, 178, 0.05);
 }
 
 .btn-back-to-model {
     width: 100%;
     max-width: 400px;
-    margin: 40px auto 0;
+    margin: 16px auto 0;
     display: block;
     background-color: var(--color-green-main);
     color: var(--color-white);
@@ -847,6 +847,24 @@ body {
     padding: 30px;
     overflow-y: auto;
     flex: 1;
+}
+
+.resources-modal-list .resources-modal-ol {
+    list-style: decimal;
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.resources-modal-list a {
+    color: var(--color-blue);
+    text-decoration: none;
+}
+
+.resources-modal-list a:hover {
+    text-decoration: underline;
 }
 
 /* Glossary Modal */

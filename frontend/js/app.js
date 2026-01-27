@@ -14,6 +14,8 @@ class App {
         this.selectedCluster = null;
         this.currentCompetency = null;
         this.isRendering = false;
+        this.currentClusterResources = [];
+        this.currentClusterName = '';
 
         // Stable handlers to avoid re-binding on each render
         this.onBlockClick = this.onBlockClick.bind(this);
@@ -103,6 +105,17 @@ class App {
             }
         });
 
+        // Resources modal buttons
+        const openResources = document.getElementById('btn-open-resources');
+        if (openResources) {
+            openResources.addEventListener('click', () => this.openResourcesModal());
+        }
+
+        const closeResources = document.getElementById('btn-close-resources');
+        if (closeResources) {
+            closeResources.addEventListener('click', () => this.closeResourcesModal());
+        }
+
         // Modal close buttons
         const closeGlossary = document.getElementById('btn-close-glossary');
         if (closeGlossary) {
@@ -129,6 +142,15 @@ class App {
             helpModal.addEventListener('click', (e) => {
                 if (e.target.classList.contains('modal-overlay')) {
                     this.closeHelpModal();
+                }
+            });
+        }
+
+        const resourcesModal = document.getElementById('modal-resources');
+        if (resourcesModal) {
+            resourcesModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    this.closeResourcesModal();
                 }
             });
         }
@@ -577,53 +599,46 @@ class App {
                            actions.all;
 
         // Group by type
-        const byType = {
-            '70': [],
-            '20': [],
-            '10': [],
-            'other': []
-        };
-
+        const byType = { '70': [], '20': [], '10': [], 'other': [] };
         levelActions.forEach(action => {
             const type = action.type || 'other';
-            if (byType[type] !== undefined) {
+            if (byType[type]) {
                 byType[type].push(action);
             } else {
                 byType.other.push(action);
             }
         });
 
-        // Render action groups
-        let html = '';
-        
-        const typeLabels = {
-            '70': 'Обучение на практике (70%)',
-            '20': 'Развитие на рабочем месте (20%)',
-            '10': 'Обучение и саморазвитие (10%)',
-            'other': 'Другие действия'
+        const typeMeta = {
+            '70': { title: '70% Обучение на практике', className: 'action-list-70' },
+            '20': { title: '20% Развитие на рабочем месте', className: 'action-list-20' },
+            '10': { title: '10% Обучение и саморазвитие', className: 'action-list-10' },
+            'other': { title: 'Дополнительные действия', className: 'action-list-other' }
         };
 
-        Object.entries(byType).forEach(([type, typeActions]) => {
-            if (typeActions.length > 0) {
-                html += `
-                    <div class="action-group">
-                        <h4>${typeLabels[type] || 'Действия'}</h4>
-                        <div class="action-cards">
-                            ${typeActions.map(action => `
-                                <div class="action-card">
-                                    <div class="action-card-title">${this.escapeHtml(action.text.substring(0, 50))}${action.text.length > 50 ? '...' : ''}</div>
-                                    <div class="action-card-description">${this.escapeHtml(action.text)}</div>
-                                    <div class="action-card-resource">Внешний ресурс</div>
-                                    <button class="btn-open">Открыть</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-        });
+        const order = ['70', '20', '10', 'other'];
+        const html = order
+            .filter(type => byType[type].length > 0)
+            .map(type => `
+                <section class="action-list ${typeMeta[type].className}">
+                    <div class="action-list-header">${typeMeta[type].title}</div>
+                    <ul>
+                        ${byType[type].map(action => `
+                            <li>
+                                <span class="bullet"></span>
+                                <span class="text">${this.escapeHtml(action.text)}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </section>
+            `).join('');
 
         container.innerHTML = html || '<div class="empty-state"><p>Нет действий для выбранного уровня</p></div>';
+
+        // Prepare resources data for modal
+        const resources = this.getClusterResources(competency?.cluster_id);
+        this.currentClusterResources = resources;
+        this.currentClusterName = this.dataManager.getClusterById(competency?.cluster_id)?.name || '';
     }
 
     openGlossaryModal() {
@@ -650,6 +665,40 @@ class App {
 
     closeHelpModal() {
         const modal = document.getElementById('modal-help');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    }
+
+    openResourcesModal() {
+        const modal = document.getElementById('modal-resources');
+        const list = document.getElementById('resources-modal-list');
+        const title = document.getElementById('resources-modal-title');
+
+        if (!modal || !list || !title) return;
+
+        const clusterName = this.currentClusterName || 'Ресурсы';
+        title.textContent = clusterName;
+
+        if (!this.currentClusterResources || this.currentClusterResources.length === 0) {
+            list.innerHTML = '<div class="empty-state"><p>Нет ресурсов для этого кластера</p></div>';
+        } else {
+            list.innerHTML = `
+                <ol class="resources-modal-ol">
+                    ${this.currentClusterResources.map(res => `
+                        <li>
+                            ${res.url ? `<a href="${this.escapeHtml(res.url)}" target="_blank">${this.escapeHtml(res.text)}</a>` : this.escapeHtml(res.text)}
+                        </li>
+                    `).join('')}
+                </ol>
+            `;
+        }
+
+        modal.classList.add('active');
+    }
+
+    closeResourcesModal() {
+        const modal = document.getElementById('modal-resources');
         if (modal) {
             modal.classList.remove('active');
         }
@@ -783,6 +832,58 @@ class App {
         // Render content for selected level
         if (this.currentCompetency?.id) {
             this.renderLevelContent(this.currentCompetency.id, level);
+        }
+    }
+
+    getClusterResources(clusterId) {
+        if (!clusterId) return [];
+        const competencies = this.dataManager.getCompetenciesByCluster(clusterId);
+        const seen = new Set();
+        const resources = [];
+
+        const collect = (arr) => {
+            if (!arr) return;
+            arr.forEach(action => {
+                const type = action.type;
+                if (type !== null && type !== undefined && type !== 'resource') return;
+                const text = (action.text || '').trim();
+                if (!text || seen.has(text)) return;
+                seen.add(text);
+                resources.push({
+                    text,
+                    url: this.extractUrl(text)
+                });
+            });
+        };
+
+        competencies.forEach(comp => {
+            const actions = comp.actions || {};
+            collect(actions.all);
+            Object.values(actions.by_level || {}).forEach(collect);
+        });
+
+        return resources;
+    }
+
+    extractUrl(text) {
+        const match = text?.match(/https?:\/\/\S+/);
+        return match ? match[0] : '';
+    }
+
+    updateCategoryPill(categoryId, isDetail = false) {
+        const category = this.dataManager.getCategories().find(c => c.id === categoryId);
+        const pillMain = document.getElementById('current-category-pill');
+        const pillDetail = document.getElementById('current-category-pill-2');
+        const text = category ? `Категория: ${category.name}` : '';
+
+        if (pillMain) {
+            pillMain.textContent = text;
+            pillMain.style.display = text ? 'inline-flex' : 'none';
+        }
+
+        if (pillDetail && (isDetail || text)) {
+            pillDetail.textContent = text;
+            pillDetail.style.display = text ? 'inline-flex' : 'none';
         }
     }
 }

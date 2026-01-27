@@ -110,6 +110,9 @@
                         <div id="level-description" class="level-description"></div>
                         <div id="actions-section" class="actions-section">
                             <div id="actions-content" class="actions-content"></div>
+                            <div class="resources-actions">
+                                <button id="btn-open-resources" class="btn-open-resources">Перечень внешних образовательных ресурсов</button>
+                            </div>
                         </div>
                         <button id="btn-back-to-model" class="btn-back-to-model">Вернуться к модели компетенций</button>
                     </main>
@@ -154,6 +157,20 @@
                         <li><strong>Развивающие действия:</strong> Действия сгруппированы по методологии 70/20/10: обучение на практике (70%), развитие на рабочем месте (20%), обучение и саморазвитие (10%).</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Modal -->
+    <div id="modal-resources" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="resources-modal-title">Ресурсы кластера</h2>
+                <button class="modal-close" id="btn-close-resources">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="resources-modal-list" class="resources-modal-list"></div>
             </div>
         </div>
     </div>
