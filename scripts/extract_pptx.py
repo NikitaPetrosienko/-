@@ -15,6 +15,9 @@ import sys
 from pathlib import Path
 from pptx import Presentation
 
+KNOWN_CLUSTERS = set()
+KNOWN_BLOCKS = set()
+
 def normalize_key(text):
     """Normalize text to create canonical keys for matching."""
     if not text:
@@ -43,10 +46,20 @@ def is_title_slide(text):
     """Check if slide is a title/contents slide."""
     title_keywords = [
         "содержание", "меню развивающих действий", "цель меню",
-        "из чего состоит", "как пользоваться", "руководство"
+        "из чего состоит", "как пользоваться", "руководство",
+        "словарь терминов", "перечень внешних образовательных ресурсов"
     ]
     text_lower = text.lower()
     return any(keyword in text_lower for keyword in title_keywords)
+
+def is_resources_slide(text):
+    """Check if slide contains resources list (not actions)."""
+    text_lower = text.lower()
+    return "список ресурсов" in text_lower or "перечень внешних образовательных ресурсов" in text_lower
+
+def is_glossary_slide(text):
+    """Check if slide contains glossary content."""
+    return "словарь терминов" in text.lower()
 
 def extract_competency_name_from_slide(slide):
     """Try to identify competency name from slide."""
@@ -56,6 +69,11 @@ def extract_competency_name_from_slide(slide):
     if slide.shapes.title:
         title = slide.shapes.title.text.strip()
         if title and not is_title_slide(title):
+            title_key = normalize_key(title)
+            if title_key in KNOWN_CLUSTERS or title_key in KNOWN_BLOCKS:
+                return None
+            if "обучение на практике" in title.lower() or "развитие на рабочем месте" in title.lower() or "обучение и саморазвитие" in title.lower():
+                return None
             # Check if it's a block/cluster name (usually longer)
             if len(title) > 50:
                 return None  # Probably a block/cluster, not competency
@@ -71,52 +89,67 @@ def extract_competency_name_from_slide(slide):
     
     # First substantial text might be competency name
     for text in text_shapes[:3]:
+        text_lower = text.lower()
+        if "обучение на практике" in text_lower or "развитие на рабочем месте" in text_lower or "обучение и саморазвитие" in text_lower:
+            continue
+        if re.search(r'\b70\s*%|\b20\s*%|\b10\s*%', text_lower):
+            continue
+        text_key = normalize_key(text)
+        if text_key in KNOWN_CLUSTERS or text_key in KNOWN_BLOCKS:
+            continue
         if not is_title_slide(text) and len(text) < 80:
             return text
     
     return None
 
-def extract_actions_from_slide(slide, competency_name=None):
+def extract_actions_from_slide(slide, competency_name=None, initial_type=None, initial_level=None):
     """Extract development actions from a slide."""
     actions = []
-    level = None
-    action_type = None  # 70/20/10
+    level = initial_level
+    action_type = initial_type  # 70/20/10
+    seen = set()
     
     all_text = []
     for shape in slide.shapes:
         if shape.has_text_frame:
             text = extract_text_from_shape(shape)
             if text:
-                all_text.append(text)
+                all_text.append((shape.top, shape.left, text))
     
-    # Process all text to find actions
-    for text in all_text:
-        text_lower = text.lower()
-        
+    # Process all text to find actions (top-to-bottom, left-to-right)
+    for _, _, text in sorted(all_text, key=lambda x: (x[0], x[1])):
         # Skip if this is the competency name
         if competency_name and normalize_key(text) == normalize_key(competency_name):
             continue
-        
-        # Check for level indicators
-        level_match = re.search(r'уровень\s*(\d)', text_lower)
-        if level_match:
-            level = level_match.group(1)
-            continue
-        
-        # Check for 70/20/10 indicators
-        if re.search(r'\b70\s*%|\b70\s*процентов', text_lower):
-            action_type = "70"
-        elif re.search(r'\b20\s*%|\b20\s*процентов', text_lower):
-            action_type = "20"
-        elif re.search(r'\b10\s*%|\b10\s*процентов', text_lower):
-            action_type = "10"
-        
+
         # Extract action items
-        # Actions are usually bulleted lists or numbered lists
         lines = text.split('\n')
         for line in lines:
             line = line.strip()
-            if not line or len(line) < 10:
+
+            line_lower = line.lower()
+
+            if not line:
+                continue
+
+            # Update level if line indicates level
+            level_match = re.search(r'(уровень|описание уровня)\s*(\d)', line_lower)
+            if level_match:
+                level = level_match.group(2)
+                continue
+
+            # Update action type if line indicates 70/20/10 section
+            if re.search(r'\b70\s*%|\b70\s*процентов', line_lower) or "обучение на практике" in line_lower:
+                action_type = "70"
+                continue
+            if re.search(r'\b20\s*%|\b20\s*процентов', line_lower) or "развитие на рабочем месте" in line_lower:
+                action_type = "20"
+                continue
+            if re.search(r'\b10\s*%|\b10\s*процентов', line_lower) or "обучение и саморазвитие" in line_lower:
+                action_type = "10"
+                continue
+
+            if len(line) < 10:
                 continue
             
             # Remove bullet points and numbering
@@ -130,14 +163,26 @@ def extract_actions_from_slide(slide, competency_name=None):
             # Skip common non-action text
             skip_patterns = [
                 r'^уровень\s*\d',
+                r'^описание\s*уровня',
+                r'^целевой\s*уровень',
                 r'^список\s*ресурсов',
                 r'^ресурсы\s*для',
                 r'^книга',
                 r'^курс',
+                r'^обучение\s+на\s+практике',
+                r'^развитие\s+на\s+рабочем\s+месте',
+                r'^обучение\s+и\s+саморазвитие',
                 r'^\d+$'  # Just a number
             ]
             if any(re.match(pattern, line_clean.lower()) for pattern in skip_patterns):
                 continue
+
+            if "словарь терминов" in line_clean.lower() or "список ресурсов" in line_clean.lower():
+                continue
+
+            if line_clean in seen:
+                continue
+            seen.add(line_clean)
             
             actions.append({
                 "text": line_clean,
@@ -145,7 +190,7 @@ def extract_actions_from_slide(slide, competency_name=None):
                 "type": action_type
             })
     
-    return actions
+    return actions, action_type, level
 
 def extract_all_actions(prs):
     """Extract all development actions from presentation."""
@@ -155,12 +200,21 @@ def extract_all_actions(prs):
     current_type = None
     
     for slide_idx, slide in enumerate(prs.slides, 1):
-        # Skip title slides
+        # Skip title and resources slides
         slide_text = ""
         if slide.shapes.title:
             slide_text = slide.shapes.title.text.strip()
-        
-        if is_title_slide(slide_text):
+
+        slide_all_text = []
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                text = extract_text_from_shape(shape)
+                if text:
+                    slide_all_text.append(text)
+
+        joined_text = "\n".join(slide_all_text)
+
+        if is_title_slide(slide_text) or is_resources_slide(joined_text) or is_glossary_slide(joined_text):
             continue
         
         # Try to identify competency
@@ -175,6 +229,8 @@ def extract_all_actions(prs):
             # If it's very long, it might be a block/cluster name
             if len(competency_name) < 80:
                 current_competency = competency_name
+                current_level = None
+                current_type = None
                 if comp_key not in all_actions:
                     all_actions[comp_key] = {
                         "competency_name": competency_name,
@@ -189,7 +245,12 @@ def extract_all_actions(prs):
         
         # Extract actions from this slide
         if current_competency:
-            actions = extract_actions_from_slide(slide, current_competency)
+            actions, current_type, current_level = extract_actions_from_slide(
+                slide,
+                current_competency,
+                current_type,
+                current_level
+            )
             
             comp_key = normalize_key(current_competency)
             if comp_key in all_actions:
@@ -216,12 +277,25 @@ def extract_all_actions(prs):
     return all_actions
 
 def main():
-    pptx_path = Path(__file__).parent.parent / "data-src" / "menu.pptx"
+    base_dir = Path(__file__).parent.parent
+    pptx_path = base_dir / "data-src" / "menu.pptx"
+    if not pptx_path.exists():
+        pptx_path = base_dir / "data" / "Меню развивающих действий_ШЦР.pptx"
     
     if not pptx_path.exists():
         print(f"Error: PowerPoint file not found at {pptx_path}")
         sys.exit(1)
     
+    # Load known cluster/block names to avoid mislabeling slides as competencies
+    model_path = base_dir / "frontend" / "data" / "model.json"
+    if model_path.exists():
+        with open(model_path, "r", encoding="utf-8") as f:
+            model_data = json.load(f)
+        for c in model_data.get("clusters", []):
+            KNOWN_CLUSTERS.add(normalize_key(c.get("name", "")))
+        for b in model_data.get("blocks", []):
+            KNOWN_BLOCKS.add(normalize_key(b.get("name", "")))
+
     print(f"Loading PowerPoint file: {pptx_path}")
     prs = Presentation(pptx_path)
     

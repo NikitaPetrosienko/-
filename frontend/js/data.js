@@ -3,7 +3,7 @@
  * Handles loading and caching of JSON data
  */
 
-const DATA_CACHE_KEY = 'appDataCache_v1';
+const DATA_CACHE_KEY = 'appDataCache_v2';
 
 class DataManager {
     constructor() {

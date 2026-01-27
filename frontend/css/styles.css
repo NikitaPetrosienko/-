@@ -34,13 +34,15 @@
     box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#app {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 16px;
     line-height: 1.6;
     color: var(--color-gray-1);
-    background-color: #f6f1e7;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='none'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23EAAA00' fill-opacity='0.35'/%3E%3Ccircle cx='60' cy='36' r='2' fill='%230067B2' fill-opacity='0.35'/%3E%3Ccircle cx='100' cy='80' r='3' fill='%23009639' fill-opacity='0.28'/%3E%3Ccircle cx='30' cy='95' r='2' fill='%230067B2' fill-opacity='0.35'/%3E%3Ccircle cx='85' cy='20' r='2.5' fill='%23ED6E1C' fill-opacity='0.35'/%3E%3C/svg%3E");
+    background-color: #f7f8fa;
+    background-image: none;
 }
 
 .container {
@@ -669,6 +671,15 @@ body {
     gap: 16px;
 }
 
+.actions-footer {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .action-list {
     border-radius: 10px;
     overflow: hidden;
@@ -725,33 +736,29 @@ body {
 .action-list-other .action-list-header { background: rgba(83, 86, 90, 0.9); }
 .action-list-other li .bullet { color: var(--color-gray-1); }
 
-.resources-actions {
-    margin-top: 18px;
-    display: flex;
-    justify-content: flex-end;
-}
-
 .btn-open-resources {
-    background: var(--color-white);
-    border: 1px solid var(--color-gray-light);
-    color: var(--color-blue);
-    padding: 10px 16px;
+    background: var(--color-blue);
+    border: none;
+    color: var(--color-white);
+    padding: 15px 30px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 1em;
     transition: all 0.2s;
 }
 
 .btn-open-resources:hover {
-    border-color: var(--color-blue);
-    background: rgba(0, 103, 178, 0.05);
+    background: var(--color-blue-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 103, 178, 0.3);
 }
 
 .btn-back-to-model {
     width: 100%;
-    max-width: 400px;
-    margin: 16px auto 0;
-    display: block;
+    max-width: 360px;
+    margin: 0;
+    display: inline-block;
     background-color: var(--color-green-main);
     color: var(--color-white);
     border: none;

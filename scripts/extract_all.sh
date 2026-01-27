@@ -16,6 +16,10 @@ echo "=== Извлечение данных из PowerPoint ==="
 python3 scripts/extract_pptx.py
 
 echo ""
+echo "=== Извлечение ресурсов из PowerPoint ==="
+python3 scripts/extract_resources.py
+
+echo ""
 echo "=== Нормализация и объединение данных ==="
 python3 scripts/normalize_data.py
 

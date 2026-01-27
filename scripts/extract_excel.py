@@ -211,7 +211,10 @@ def extract_level_scale(ws):
     return scale
 
 def main():
-    excel_path = Path(__file__).parent.parent / "data-src" / "model.xlsx"
+    base_dir = Path(__file__).parent.parent
+    excel_path = base_dir / "data-src" / "model.xlsx"
+    if not excel_path.exists():
+        excel_path = base_dir / "data" / "Модель_цифровых_компетенций.xlsx"
     
     if not excel_path.exists():
         print(f"Error: Excel file not found at {excel_path}")

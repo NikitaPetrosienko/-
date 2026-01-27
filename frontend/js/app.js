@@ -595,9 +595,17 @@ class App {
         }
 
         // Get actions for the selected level
-        const levelActions = actions.by_level?.[String(level)] || 
-                           actions.by_level?.['all'] || 
-                           actions.all;
+        const levelActionsRaw = actions.by_level?.[String(level)] || 
+                              actions.by_level?.['all'] || 
+                              actions.all;
+
+        // Filter out терминологию/ресурсы, чтобы не показывать их в действиях
+        const levelActions = levelActionsRaw.filter(a => {
+            const text = (a.text || '').toLowerCase();
+            if (text.includes('словарь терминов')) return false;
+            if (text.includes('список ресурсов')) return false;
+            return true;
+        });
 
         // Group by type
         const byType = { '70': [], '20': [], '10': [], 'other': [] };

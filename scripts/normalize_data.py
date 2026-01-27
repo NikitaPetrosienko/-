@@ -42,6 +42,10 @@ def find_best_match(comp_name, comp_list, threshold=0.7):
         if comp_key == comp_id:
             return comp_id, 1.0
         
+        # Try substring match
+        if comp_key and (comp_key in comp_id or comp_id in comp_key):
+            return comp_id, 0.9
+
         # Try name similarity
         score1 = similarity(comp_name, comp_name_alt)
         score2 = similarity(comp_key, comp_id)
@@ -112,11 +116,11 @@ def merge_data(model_data, actions_data):
             }
             merged["competencies"].append(comp_copy)
     
-    # Save unmatched for review
+    # Save unmatched for review (write empty list when none)
+    unmatched_path = Path(__file__).parent.parent / "frontend" / "data" / "unmatched_actions.json"
+    with open(unmatched_path, 'w', encoding='utf-8') as f:
+        json.dump(unmatched_actions, f, ensure_ascii=False, indent=2)
     if unmatched_actions:
-        unmatched_path = Path(__file__).parent.parent / "frontend" / "data" / "unmatched_actions.json"
-        with open(unmatched_path, 'w', encoding='utf-8') as f:
-            json.dump(unmatched_actions, f, ensure_ascii=False, indent=2)
         print(f"\n  Saved {len(unmatched_actions)} unmatched actions to: {unmatched_path}")
     
     return merged
