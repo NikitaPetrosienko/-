@@ -116,6 +116,7 @@ body,
 .screen {
     display: none;
     min-height: calc(100vh - 60px);
+    background-image: none;
 }
 
 .screen.active {
@@ -737,7 +738,7 @@ body,
 .action-list-other li .bullet { color: var(--color-gray-1); }
 
 .btn-open-resources {
-    background: var(--color-blue);
+    background: var(--color-blue-deep, #00375F);
     border: none;
     color: var(--color-white);
     padding: 15px 30px;
@@ -749,7 +750,7 @@ body,
 }
 
 .btn-open-resources:hover {
-    background: var(--color-blue-deep);
+    background: var(--color-blue);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 103, 178, 0.3);
 }
