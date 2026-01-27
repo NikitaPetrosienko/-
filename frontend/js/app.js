@@ -28,6 +28,7 @@ class App {
         try {
             // Load data first
             await this.dataManager.load();
+            await this.dataManager.loadResources();
             
             // Load saved state
             const savedCategory = localStorage.getItem('selectedCategoryId');
@@ -837,32 +838,14 @@ class App {
 
     getClusterResources(clusterId) {
         if (!clusterId) return [];
-        const competencies = this.dataManager.getCompetenciesByCluster(clusterId);
-        const seen = new Set();
-        const resources = [];
-
-        const collect = (arr) => {
-            if (!arr) return;
-            arr.forEach(action => {
-                const type = action.type;
-                if (type !== null && type !== undefined && type !== 'resource') return;
-                const text = (action.text || '').trim();
-                if (!text || seen.has(text)) return;
-                seen.add(text);
-                resources.push({
-                    text,
-                    url: this.extractUrl(text)
-                });
-            });
-        };
-
-        competencies.forEach(comp => {
-            const actions = comp.actions || {};
-            collect(actions.all);
-            Object.values(actions.by_level || {}).forEach(collect);
-        });
-
-        return resources;
+        const fromFile = this.dataManager.getResourcesByCluster(clusterId);
+        if (fromFile && fromFile.length > 0) {
+            return fromFile.map(r => ({
+                text: r.text || '',
+                url: r.url || this.extractUrl(r.text || '')
+            }));
+        }
+        return [];
     }
 
     extractUrl(text) {

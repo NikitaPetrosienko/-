@@ -10,6 +10,8 @@ class DataManager {
         this.data = null;
         this.loading = false;
         this.indexes = null;
+        this.resources = null;
+        this.resourcesLoading = false;
     }
 
     async load() {
@@ -56,6 +58,32 @@ class DataManager {
         }
     }
 
+    async loadResources() {
+        if (this.resources) return this.resources;
+        if (this.resourcesLoading) {
+            while (this.resourcesLoading) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            return this.resources;
+        }
+
+        this.resourcesLoading = true;
+        try {
+            const response = await fetch('data/resources.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load resources: ${response.statusText}`);
+            }
+            const payload = await response.json();
+            this.resources = payload.resources_by_cluster || {};
+            return this.resources;
+        } catch (error) {
+            console.error('Error loading resources:', error);
+            throw error;
+        } finally {
+            this.resourcesLoading = false;
+        }
+    }
+
     getCategories() {
         return this.data?.categories || [];
     }
@@ -82,6 +110,10 @@ class DataManager {
 
     getGlossary() {
         return this.data?.glossary || {};
+    }
+
+    getResourcesByCluster(clusterId) {
+        return (this.resources && this.resources[clusterId]) ? this.resources[clusterId] : [];
     }
 
     getBlockById(id) {
