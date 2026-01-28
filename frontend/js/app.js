@@ -732,13 +732,16 @@ class App {
         const container = document.getElementById('glossary-list');
         if (!container) return;
 
-        const terms = Object.values(glossary);
+        const terms = Object.values(glossary).filter(term => !this.isGlossaryLabelRow(term));
         
         container.innerHTML = terms.map(term => `
-            <div class="glossary-item">
-                <div class="glossary-term">${this.escapeHtml(term.term)}</div>
-                <div class="glossary-definition">${this.escapeHtml(term.definition)}</div>
-            </div>
+            ${this.isGlossarySection(term)
+                ? `<div class="glossary-section">${this.escapeHtml(term.term)}</div>`
+                : `<div class="glossary-item">
+                        <div class="glossary-term">${this.escapeHtml(term.term)}</div>
+                        <div class="glossary-definition">${this.escapeHtml(term.definition)}</div>
+                   </div>`
+            }
         `).join('');
     }
 
@@ -747,7 +750,9 @@ class App {
         const container = document.getElementById('glossary-list');
         if (!container) return;
 
-        const terms = Object.values(glossary);
+        const terms = Object.values(glossary)
+            .filter(term => !this.isGlossaryLabelRow(term))
+            .filter(term => !this.isGlossarySection(term));
         const filtered = terms.filter(term => {
             const search = searchTerm.toLowerCase();
             return term.term.toLowerCase().includes(search) || 
@@ -760,6 +765,22 @@ class App {
                 <div class="glossary-definition">${this.escapeHtml(term.definition)}</div>
             </div>
         `).join('');
+    }
+
+    isGlossarySection(term) {
+        const termText = (term?.term || '').trim();
+        const definitionText = (term?.definition || '').trim();
+        if (!termText) return false;
+        if (!definitionText) return true;
+        return false;
+    }
+
+    isGlossaryLabelRow(term) {
+        const termText = (term?.term || '').trim().toLowerCase();
+        const definitionText = (term?.definition || '').trim().toLowerCase();
+        if (termText === 'термин / сокращение') return true;
+        if (definitionText === 'русскоязычное название / расшифровка') return true;
+        return false;
     }
 
     escapeHtml(text) {
