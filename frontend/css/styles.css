@@ -83,6 +83,10 @@ body,
     justify-content: center;
 }
 
+.header-logo-link {
+    display: inline-flex;
+}
+
 .header-logo img {
     height: 48px;
     width: auto;
@@ -673,7 +677,7 @@ body,
 }
 
 .actions-footer {
-    margin-top: 18px;
+    margin-top: 28px;
     display: flex;
     justify-content: space-between;
     gap: 12px;
