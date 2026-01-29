@@ -426,12 +426,17 @@ class App {
             this.dataManager.getCompetenciesByCluster(activeClusterId) : 
             this.dataManager.getCompetencies();
 
-        if (filtered.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>Нет компетенций для отображения</p></div>';
+        // Hide competencies without target level for the selected category
+        const filteredByTarget = filtered.filter(competency => {
+            return this.dataManager.getTargetLevel(categoryId, competency.id);
+        });
+
+        if (filteredByTarget.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>Нет компетенций с целевым уровнем для выбранной категории</p></div>';
             return;
         }
 
-        container.innerHTML = filtered.map(competency => {
+        container.innerHTML = filteredByTarget.map(competency => {
             const targetLevel = this.dataManager.getTargetLevel(categoryId, competency.id);
             const levelText = targetLevel ? `Целевой уровень: ${targetLevel}` : 'Целевой уровень: —';
             
