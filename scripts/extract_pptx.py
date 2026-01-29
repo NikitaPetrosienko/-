@@ -29,6 +29,13 @@ def normalize_key(text):
     text = re.sub(r'[-\s]+', '_', text)
     return text.strip('_')
 
+EXCLUDED_ACTIONS = {
+    normalize_key("Начать формулировать запросы на данные в структурированном виде: какая цель, какой вопрос нужно ответить, какие поля (колонки) нужны, за какой период, какие фильтры/разрезы, какой формат вывода."): True,
+    normalize_key("Регулярно обсуждать с аналитиками, какие данные реально доступны, какие есть ограничения по качеству/частоте/точности, сколько времени займет реализация."): True,
+    normalize_key("Принять участие в согласовании регулярного (еженедельного/ежемесячного) отчета: совместно определить, какие показатели и разрезы нужны для управления."): True,
+    normalize_key("Проверять полученные выгрузки и отчеты: соответствуют ли они требованиям, нет ли ошибок."): True,
+}
+
 def clean_text(text, keep_linebreaks=True):
     if text is None:
         return ""
@@ -234,6 +241,8 @@ def extract_actions_from_slide(slide, competency_name=None, initial_type=None, i
                 continue
             if line_key in KNOWN_CLUSTERS or line_key in KNOWN_BLOCKS:
                 continue
+            if line_key in EXCLUDED_ACTIONS:
+                continue
 
             if action_type is None:
                 action_type = default_type or "70"
@@ -280,7 +289,12 @@ def extract_all_actions(prs):
 
         joined_text = "\n".join(slide_all_text)
 
-        if is_title_slide(slide_text) or is_title_slide(joined_text) or is_resources_slide(joined_text) or is_glossary_slide(joined_text):
+        skip = is_title_slide(slide_text) or is_resources_slide(joined_text) or is_glossary_slide(joined_text)
+        if not skip and not slide_text:
+            joined_lower = joined_text.lower()
+            if "содержание" in joined_lower or "меню развивающих действий" in joined_lower:
+                skip = True
+        if skip:
             continue
         
         # Try to identify competency
