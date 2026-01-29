@@ -32,6 +32,75 @@ def normalize_key(text):
     text = re.sub(r'[-\s]+', '_', text)
     return text.strip('_')
 
+def build_merged_value_map(ws):
+    """Build map of merged cell coordinates -> top-left value."""
+    merged_map = {}
+    for merged in ws.merged_cells.ranges:
+        min_col, min_row, max_col, max_row = merged.bounds
+        top_left = ws.cell(row=min_row, column=min_col).value
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                merged_map[(row, col)] = top_left
+    return merged_map
+
+def get_cell_value(ws, row, col, merged_map):
+    """Get cell value, filling from merged cells when needed."""
+    value = ws.cell(row=row, column=col).value
+    if value is None and merged_map:
+        value = merged_map.get((row, col))
+    return value
+
+def find_categories_row(ws, merged_map):
+    """Try to detect the header row with category names in columns G-K."""
+    best_row = None
+    best_score = -1
+    best_values = []
+
+    max_scan = min(10, ws.max_row)
+    for row_idx in range(1, max_scan + 1):
+        values = [get_cell_value(ws, row_idx, col, merged_map) for col in range(7, 12)]
+        score = 0
+        cleaned = []
+        non_empty = []
+        for value in values:
+            if value is None:
+                cleaned.append("")
+                continue
+            text = str(value).strip()
+            if not text or text == "None":
+                cleaned.append("")
+                continue
+            try:
+                float(text)
+                cleaned.append("")
+                continue
+            except ValueError:
+                cleaned.append(text)
+                score += 1
+                non_empty.append(text)
+
+        if score <= 0:
+            continue
+
+        row_text = " ".join(
+            [str(get_cell_value(ws, row_idx, col, merged_map) or "") for col in range(1, 7)]
+        ).lower()
+        if "категор" in row_text:
+            score += 1
+        unique_count = len({val for val in non_empty if val})
+        score += unique_count
+        if unique_count == 1 and score > 0:
+            score -= 2
+
+        if score > best_score:
+            best_score = score
+            best_row = row_idx
+            best_values = cleaned
+
+    if best_row is None:
+        return 2, []
+    return best_row, best_values
+
 def extract_main_matrix(ws):
     """Extract competency data from main matrix sheet."""
     categories = []
@@ -41,15 +110,20 @@ def extract_main_matrix(ws):
     target_levels = {}
     level_descriptions = {}
     
+    merged_map = build_merged_value_map(ws)
+
     # Read header row to identify categories
-    header_row = None
-    for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=3, values_only=True), 1):
-        if row_idx == 2:  # Second row has category names
-            # Categories are in columns G-K (7-11)
-            categories = [str(cell).strip() if cell else "" for cell in row[6:11]]
-            categories = [cat for cat in categories if cat and cat != "None"]
-            header_row = row_idx
-            break
+    header_row, header_values = find_categories_row(ws, merged_map)
+    if header_values:
+        categories = [cat for cat in header_values if cat and cat != "None"]
+    else:
+        # Fallback to row 2, columns G-K
+        categories = []
+        for col in range(7, 12):
+            cell_value = get_cell_value(ws, 2, col, merged_map)
+            if cell_value:
+                categories.append(str(cell_value).strip())
+        categories = [cat for cat in categories if cat and cat != "None"]
     
     print(f"Found categories: {categories}")
     
@@ -57,8 +131,10 @@ def extract_main_matrix(ws):
     current_block = None
     current_cluster = None
     
-    # Process data rows (starting from row 3)
-    for row_idx, row in enumerate(ws.iter_rows(min_row=3, values_only=True), 3):
+    # Process data rows (starting from row after header)
+    start_row = (header_row or 2) + 1
+    for row_idx in range(start_row, ws.max_row + 1):
+        row = [get_cell_value(ws, row_idx, col, merged_map) for col in range(1, ws.max_column + 1)]
         # Check if row is empty
         if not any(row[:6]):  # First 6 columns should have data
             continue
@@ -90,7 +166,8 @@ def extract_main_matrix(ws):
                 if current_block:
                     block_id = normalize_key(current_block)
                     if block_id in blocks:
-                        blocks[block_id]["clusters"].append(cluster_id)
+                        if cluster_id not in blocks[block_id]["clusters"]:
+                            blocks[block_id]["clusters"].append(cluster_id)
         
         # Extract competency (column C)
         competency_name = str(row[2]).strip() if row[2] else None
@@ -116,10 +193,11 @@ def extract_main_matrix(ws):
                     except (ValueError, TypeError):
                         pass
         
-        # Extract level descriptions (columns M-P, indices 12-15)
+        # Extract level descriptions (columns L-P, indices 11-15)
         level_descs = {}
-        for level_num in range(1, 5):
-            desc_idx = 11 + level_num  # Column M=12 (index 11), N=13, O=14, P=15
+        base_desc_idx = 11  # Column L (index 11)
+        for level_num in range(1, 6):
+            desc_idx = base_desc_idx + (level_num - 1)
             if desc_idx < len(row):
                 desc = str(row[desc_idx]).strip() if row[desc_idx] else ""
                 if desc and desc != "None":
@@ -152,7 +230,9 @@ def extract_main_matrix(ws):
         
         # Add to cluster
         if current_cluster:
-            clusters[normalize_key(current_cluster)]["competencies"].append(competency_id)
+            cluster_key = normalize_key(current_cluster)
+            if cluster_key in clusters:
+                clusters[cluster_key]["competencies"].append(competency_id)
         
         # Store target levels by category
         for cat_key, level in category_levels.items():

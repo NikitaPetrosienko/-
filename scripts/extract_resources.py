@@ -7,6 +7,7 @@ Outputs frontend/data/resources.json
 
 import json
 import re
+from difflib import SequenceMatcher
 from pathlib import Path
 from pptx import Presentation
 
@@ -18,6 +19,11 @@ def normalize(text):
 def extract_texts(slide):
     texts = []
     for shape in slide.shapes:
+        if hasattr(shape, "has_table") and shape.has_table:
+            for row in shape.table.rows:
+                for cell in row.cells:
+                    if cell.text:
+                        texts.append(cell.text.strip())
         if hasattr(shape, "text") and shape.text:
             texts.append(shape.text.strip())
     return texts
@@ -53,6 +59,9 @@ def extract_resources_for_slide(texts, cluster_title):
         })
     return result
 
+def similarity(a, b):
+    return SequenceMatcher(None, a, b).ratio()
+
 def main():
     project_dir = Path(__file__).parent.parent
     model_path = project_dir / "frontend" / "data" / "model.json"
@@ -82,14 +91,23 @@ def main():
         candidates = [t.splitlines()[0].strip() for t in texts if t.strip()]
         cluster_id = None
         cluster_title = None
+        best_score = 0
         for cand in candidates:
             cand_norm = normalize(cand)
             for cid, cnorm in cluster_norm.items():
-                if cand_norm and (cand_norm in cnorm or cnorm in cand_norm):
+                if not cand_norm or not cnorm:
+                    continue
+                if cand_norm == cnorm:
                     cluster_id = cid
                     cluster_title = cand
+                    best_score = 1.0
                     break
-            if cluster_id:
+                score = similarity(cand_norm, cnorm)
+                if score > best_score and score >= 0.7:
+                    best_score = score
+                    cluster_id = cid
+                    cluster_title = cand
+            if best_score == 1.0:
                 break
 
         if not cluster_id:

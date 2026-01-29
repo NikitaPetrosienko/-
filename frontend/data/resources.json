@@ -72,148 +72,194 @@
         "url": "https://www.kaspersky.ru/blog/information-check-2022/32247/"
       }
     ],
-    "продуктовое_и_предпринимательское_мышление": [
-      {
-        "text": "Курс — Coursera: Product Management Specialization — https://www.coursera.org/specializations/product-management",
-        "url": "https://www.coursera.org/specializations/product-management"
-      },
-      {
-        "text": "Курс — GoPractice: Симулятор управления продуктом — https://gopractice.ru/course/pm/",
-        "url": "https://gopractice.ru/course/pm/"
-      },
-      {
-        "text": "Курс — Krokit.org: Продакт-менеджмент (бесплатно) — https://krokit.org/courses/product/",
-        "url": "https://krokit.org/courses/product/"
-      },
-      {
-        "text": "Курс — Reforge: Product Management (International) — https://www.reforge.com/products/product-management",
-        "url": "https://www.reforge.com/products/product-management"
-      },
-      {
-        "text": "Курс — SkillFactory: Product Manager профессия — https://skillfactory.ru/product-manager",
-        "url": "https://skillfactory.ru/product-manager"
-      },
-      {
-        "text": "Курс — SkillFactory: Юнит-экономика и метрики — https://skillfactory.ru/unit-economics",
-        "url": "https://skillfactory.ru/unit-economics"
-      },
-      {
-        "text": "Курс — Нетология: Метрики продукта — https://netology.ru/programs/product-metrics",
-        "url": "https://netology.ru/programs/product-metrics"
-      },
-      {
-        "text": "Курс — Яндекс Практикум: Продакт-менеджмент — https://practicum.yandex.ru/product-manager/",
-        "url": "https://practicum.yandex.ru/product-manager/"
-      },
-      {
-        "text": "Симулятор — GoPractice: Симулятор метрик — https://gopractice.ru/",
-        "url": "https://gopractice.ru/"
-      },
-      {
-        "text": "Книга — Бизнес с нуля. Метод Lean Startup",
-        "url": ""
-      },
-      {
-        "text": "Книга — Вдохновленные: Как создавать продукты, которые любят",
-        "url": ""
-      },
-      {
-        "text": "Книга — Дилемма инноватора",
-        "url": ""
-      },
-      {
-        "text": "Книга — Легко не будет. Как построить бизнес, когда вопросов больше ответов",
-        "url": ""
-      },
-      {
-        "text": "Книга — На крючке. Как создавать продукты, формирующие привычки",
-        "url": ""
-      },
-      {
-        "text": "Книга — Спроси маму. Как разговаривать с клиентами и подтвердить идею",
-        "url": ""
-      },
-      {
-        "text": "Статья — Обзор Agile. Что это: методология, метод или философия? — https://scrumtrek.ru/blog/agile-scrum/4029/metodologiya-agile/",
-        "url": "https://scrumtrek.ru/blog/agile-scrum/4029/metodologiya-agile/"
-      },
-      {
-        "text": "Курс — Полное погружение в продакт-менеджмент — https://productlab.ru/product_manager",
-        "url": "https://productlab.ru/product_manager"
-      },
-      {
-        "text": "Курс — Лаборатория сильных продуктов — https://productlab.ru/laboratory",
-        "url": "https://productlab.ru/laboratory"
-      },
-      {
-        "text": "Курс — Нейросети для работы с продуктом — https://productlab.ru/ai-analytics-product",
-        "url": "https://productlab.ru/ai-analytics-product"
-      },
-      {
-        "text": "Курс — Обучение OKR с нуля до профи — https://productlab.ru/okr",
-        "url": "https://productlab.ru/okr"
-      },
-      {
-        "text": "Курс — Курс по Agile, Scrum и Kanban — https://productlab.ru/agile",
-        "url": "https://productlab.ru/agile"
-      },
-      {
-        "text": "Курс — Поиск идей для продукта и бизнеса — https://productlab.ru/search-ideas",
-        "url": "https://productlab.ru/search-ideas"
-      },
-      {
-        "text": "Курс — Продуктовые исследования: клиенты, рынок, тренды — https://productlab.ru/product-research",
-        "url": "https://productlab.ru/product-research"
-      },
-      {
-        "text": "Курс — Вывод продукта на рынок: маркетинг, аналитика, стратегия — https://productlab.ru/product-launch",
-        "url": "https://productlab.ru/product-launch"
-      }
-    ],
     "процессное_и_системное_мышление": [
       {
-        "text": "Книга — The Business Process Management Framework (BPMN 2.0)",
+        "text": "1 Определение проблемы и эффекта в терминах экономического результата",
         "url": ""
       },
       {
-        "text": "Книга — Изучая бизнес-процессы. Руководство по моделированию",
+        "text": "2 Постановка и проверка гипотез короткими итерациями",
         "url": ""
       },
       {
-        "text": "Книга — Реинжиниринг бизнес-процессов",
+        "text": "3 формулирование цифровых идей на основе пользовательских и производственных инсайтов",
         "url": ""
       },
       {
-        "text": "Книга — Фундаментальные основы управления бизнес-процессами",
+        "text": "4 Оценка и приоритизация инициатив по эффекту и трудозатратам",
         "url": ""
       },
       {
-        "text": "Курс — SkillFactory: Бизнес-процессы и оптимизация — https://skillfactory.ru/business-processes",
-        "url": "https://skillfactory.ru/business-processes"
+        "text": "1 Видение сквозных процессов и взаимосвязей между функциями",
+        "url": ""
       },
       {
-        "text": "Курс — ВШЭ: Процессное управление — https://hse.ru/edu/dpo/898841647",
+        "text": "2  Определение узких мест и потерь в процессах",
+        "url": ""
+      },
+      {
+        "text": "3 Построение схем и моделей процессов (BPMN, SIPOC и др.)",
+        "url": ""
+      }
+    ],
+    "инструментальные_навыки_цифрового_сотрудника": [
+      {
+        "text": "Курс — Skillbox: Курс по RPA UiPath — https://skillbox.ru/course/rpa-uipath/",
+        "url": "https://skillbox.ru/course/rpa-uipath/"
+      },
+      {
+        "text": "Курс — Нетология: Автоматизация и RPA — https://netology.ru/programs/rpa",
+        "url": "https://netology.ru/programs/rpa"
+      },
+      {
+        "text": "Учебник — Primo RPA: Официальные учебники — https://docs.primo-rpa.ru/",
+        "url": "https://docs.primo-rpa.ru/"
+      },
+      {
+        "text": "Книга — Business Process Change: A Guide for Business Managers",
+        "url": ""
+      },
+      {
+        "text": "Книга — Business Process Management Cases",
+        "url": ""
+      },
+      {
+        "text": "Книга — Digital Transformation with Business Process Management",
+        "url": ""
+      },
+      {
+        "text": "Книга — RPA: Robotic Process Automation Handbook",
+        "url": ""
+      },
+      {
+        "text": "Статья — Что представляет собой искусственный интеллект (ИИ)? — https://habr.com/ru/articles/710350/",
+        "url": "https://habr.com/ru/articles/710350/"
+      },
+      {
+        "text": "Статья — Спросили нейросеть Алиса: как правильно писать промпты — https://practicum.yandex.ru/blog/kak-pravilno-pisat-promty-dlya-neyroseti/",
+        "url": "https://practicum.yandex.ru/blog/kak-pravilno-pisat-promty-dlya-neyroseti/"
+      },
+      {
+        "text": "Статья — Искусство общения с LLM: Гайд по техникам Prompt Engineering — https://habr.com/ru/articles/827546/",
+        "url": "https://habr.com/ru/articles/827546/"
+      },
+      {
+        "text": "Статья — Чат-боты окружают нас повсюду, но не нарушают ли они нашу конфиденциальность? — https://www.kaspersky.ru/resource-center/preemptive-safety/chatbots",
+        "url": "https://www.kaspersky.ru/resource-center/preemptive-safety/chatbots"
+      }
+    ],
+    "технологическая_грамотность_и_архитектура_ис": [
+      {
+        "text": "Курс — Skillbox: Архитектура микросервисов — https://skillbox.ru/course/microservices-architecture/",
+        "url": "https://skillbox.ru/course/microservices-architecture/"
+      },
+      {
+        "text": "Курс — ВШЭ: Архитектура ИС и облако — https://hse.ru/edu/dpo/898841647",
         "url": "https://hse.ru/edu/dpo/898841647"
       },
       {
-        "text": "Курс — Нетология: Бизнес-аналитик процессный — https://netology.ru/programs/business-analytics-online",
-        "url": "https://netology.ru/programs/business-analytics-online"
-      },
-      {
-        "text": "Курс — Нетология: Менеджер бизнес-процессов — https://netology.ru/programs/business_process_manager",
-        "url": "https://netology.ru/programs/business_process_manager"
-      },
-      {
-        "text": "Курс — Яндекс: Lean и оптимизация — https://practicum.yandex.ru/",
+        "text": "Курс — Яндекс: Архитектура больших систем — https://practicum.yandex.ru/",
         "url": "https://practicum.yandex.ru/"
       },
       {
-        "text": "Учебник — BPMN: Учебник (бесплатно) — https://www.bpmn.org/",
-        "url": "https://www.bpmn.org/"
+        "text": "Учебник — 4CIO Клуб: Учебник ИТ-директора — https://book4cio.ru",
+        "url": "https://book4cio.ru"
+      }
+    ],
+    "управление_цифровыми_инициативами": [
+      {
+        "text": "Книга — 4CDTO Клуб: Учебник CDTO — https://book4cdto.ru",
+        "url": "https://book4cdto.ru"
       },
       {
-        "text": "Книга — Scrum Революционный метод управления проектами",
+        "text": "Курс — OpenEdu: Цифровая трансформация (СПбГУ) — https://openedu.ru/course/spbu/DIGBUS/",
+        "url": "https://openedu.ru/course/spbu/DIGBUS/"
+      },
+      {
+        "text": "Программа — Profitcon: Premium программа CDTO — https://profitcon.ru/events/seminars/",
+        "url": "https://profitcon.ru/events/seminars/"
+      },
+      {
+        "text": "Программа — МШУ Сколково: Digital Shift программа — https://skolkovo.ru/programmes/cdto/",
+        "url": "https://skolkovo.ru/programmes/cdto/"
+      },
+      {
+        "text": "Книга — Leading Digital: Turning Technology into Business Transformation",
         "url": ""
+      },
+      {
+        "text": "Книга — Why Digital Transformations Fail",
+        "url": ""
+      },
+      {
+        "text": "Книга — Цифровая трансформация бизнеса",
+        "url": ""
+      },
+      {
+        "text": "Книга — Digital scale - настольная книга по трансформациибизнеса",
+        "url": ""
+      }
+    ],
+    "инженерная_аналитика_и_моделирование_на_данных": [
+      {
+        "text": "Курс — Учебник по машинному обучению — https://education.yandex.ru/handbook/ml",
+        "url": "https://education.yandex.ru/handbook/ml"
+      },
+      {
+        "text": "Книга — Artificial Intelligence: A Modern Approach",
+        "url": ""
+      },
+      {
+        "text": "Книга — Deep Learning",
+        "url": ""
+      },
+      {
+        "text": "Книга — Fundamentals of Machine Learning for Predictive Data Analytics",
+        "url": ""
+      },
+      {
+        "text": "Книга — Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow",
+        "url": ""
+      },
+      {
+        "text": "Книга — Kaggle. Машинное обучение и анализ данных",
+        "url": ""
+      },
+      {
+        "text": "Книга — Machine Learning Yearning",
+        "url": ""
+      },
+      {
+        "text": "Книга — Machine Learning: A Probabilistic Perspective",
+        "url": ""
+      },
+      {
+        "text": "Книга — Python для сложных задач: наука о данных",
+        "url": ""
+      },
+      {
+        "text": "Книга — The Elements of Statistical Learning",
+        "url": ""
+      },
+      {
+        "text": "Книга — Глубокое обучение. Погружение в мир нейронных сетей",
+        "url": ""
+      },
+      {
+        "text": "Книга — Инженерия машинного обучения",
+        "url": ""
+      },
+      {
+        "text": "Книга — Книга: Deep Learning - Goodfellow, Bengio — https://www.deeplearningbook.org/",
+        "url": "https://www.deeplearningbook.org/"
+      },
+      {
+        "text": "Книга — Машинное обучение без лишних слов (The Hundred-Page ML Book)",
+        "url": ""
+      },
+      {
+        "text": "Курс — Coursera: Andrew Ng - Machine Learning — https://www.coursera.org/learn/machine-learning",
+        "url": "https://www.coursera.org/learn/machine-learning"
       }
     ],
     "работа_с_данными_и_аналитикой": [
@@ -334,70 +380,6 @@
         "url": "https://karpov.courses/simulator-sql#!/tab/469016097-2"
       }
     ],
-    "инструментальные_навыки_цифрового_сотрудника": [
-      {
-        "text": "Курс — Skillbox: Курс по RPA UiPath — https://skillbox.ru/course/rpa-uipath/",
-        "url": "https://skillbox.ru/course/rpa-uipath/"
-      },
-      {
-        "text": "Курс — Нетология: Автоматизация и RPA — https://netology.ru/programs/rpa",
-        "url": "https://netology.ru/programs/rpa"
-      },
-      {
-        "text": "Учебник — Primo RPA: Официальные учебники — https://docs.primo-rpa.ru/",
-        "url": "https://docs.primo-rpa.ru/"
-      },
-      {
-        "text": "Книга — Business Process Change: A Guide for Business Managers",
-        "url": ""
-      },
-      {
-        "text": "Книга — Business Process Management Cases",
-        "url": ""
-      },
-      {
-        "text": "Книга — Digital Transformation with Business Process Management",
-        "url": ""
-      },
-      {
-        "text": "Книга — RPA: Robotic Process Automation Handbook",
-        "url": ""
-      },
-      {
-        "text": "Статья — Что представляет собой искусственный интеллект (ИИ)? — https://habr.com/ru/articles/710350/",
-        "url": "https://habr.com/ru/articles/710350/"
-      },
-      {
-        "text": "Статья — Спросили нейросеть Алиса: как правильно писать промпты — https://practicum.yandex.ru/blog/kak-pravilno-pisat-promty-dlya-neyroseti/",
-        "url": "https://practicum.yandex.ru/blog/kak-pravilno-pisat-promty-dlya-neyroseti/"
-      },
-      {
-        "text": "Статья — Искусство общения с LLM: Гайд по техникам Prompt Engineering — https://habr.com/ru/articles/827546/",
-        "url": "https://habr.com/ru/articles/827546/"
-      },
-      {
-        "text": "Статья — Чат-боты окружают нас повсюду, но не нарушают ли они нашу конфиденциальность? — https://www.kaspersky.ru/resource-center/preemptive-safety/chatbots",
-        "url": "https://www.kaspersky.ru/resource-center/preemptive-safety/chatbots"
-      }
-    ],
-    "технологическая_грамотность_и_архитектура_ис": [
-      {
-        "text": "Курс — Skillbox: Архитектура микросервисов — https://skillbox.ru/course/microservices-architecture/",
-        "url": "https://skillbox.ru/course/microservices-architecture/"
-      },
-      {
-        "text": "Курс — ВШЭ: Архитектура ИС и облако — https://hse.ru/edu/dpo/898841647",
-        "url": "https://hse.ru/edu/dpo/898841647"
-      },
-      {
-        "text": "Курс — Яндекс: Архитектура больших систем — https://practicum.yandex.ru/",
-        "url": "https://practicum.yandex.ru/"
-      },
-      {
-        "text": "Учебник — 4CIO Клуб: Учебник ИТ-директора — https://book4cio.ru",
-        "url": "https://book4cio.ru"
-      }
-    ],
     "цифровая_архитектура_и_интеграция_систем": [
       {
         "text": "Книга — Building Microservices: Designing Fine-Grained Systems",
@@ -410,102 +392,6 @@
       {
         "text": "Книга — Patterns of Enterprise Application Architecture",
         "url": ""
-      }
-    ],
-    "управление_цифровыми_инициативами": [
-      {
-        "text": "Книга — 4CDTO Клуб: Учебник CDTO — https://book4cdto.ru",
-        "url": "https://book4cdto.ru"
-      },
-      {
-        "text": "Курс — OpenEdu: Цифровая трансформация (СПбГУ) — https://openedu.ru/course/spbu/DIGBUS/",
-        "url": "https://openedu.ru/course/spbu/DIGBUS/"
-      },
-      {
-        "text": "Программа — Profitcon: Premium программа CDTO — https://profitcon.ru/events/seminars/",
-        "url": "https://profitcon.ru/events/seminars/"
-      },
-      {
-        "text": "Программа — МШУ Сколково: Digital Shift программа — https://skolkovo.ru/programmes/cdto/",
-        "url": "https://skolkovo.ru/programmes/cdto/"
-      },
-      {
-        "text": "Книга — Leading Digital: Turning Technology into Business Transformation",
-        "url": ""
-      },
-      {
-        "text": "Книга — Why Digital Transformations Fail",
-        "url": ""
-      },
-      {
-        "text": "Книга — Цифровая трансформация бизнеса",
-        "url": ""
-      },
-      {
-        "text": "Книга — Digital scale - настольная книга по трансформациибизнеса",
-        "url": ""
-      }
-    ],
-    "инженерная_аналитика_и_моделирование_на_данных": [
-      {
-        "text": "Курс — Учебник по машинному обучению — https://education.yandex.ru/handbook/ml",
-        "url": "https://education.yandex.ru/handbook/ml"
-      },
-      {
-        "text": "Книга — Artificial Intelligence: A Modern Approach",
-        "url": ""
-      },
-      {
-        "text": "Книга — Deep Learning",
-        "url": ""
-      },
-      {
-        "text": "Книга — Fundamentals of Machine Learning for Predictive Data Analytics",
-        "url": ""
-      },
-      {
-        "text": "Книга — Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow",
-        "url": ""
-      },
-      {
-        "text": "Книга — Kaggle. Машинное обучение и анализ данных",
-        "url": ""
-      },
-      {
-        "text": "Книга — Machine Learning Yearning",
-        "url": ""
-      },
-      {
-        "text": "Книга — Machine Learning: A Probabilistic Perspective",
-        "url": ""
-      },
-      {
-        "text": "Книга — Python для сложных задач: наука о данных",
-        "url": ""
-      },
-      {
-        "text": "Книга — The Elements of Statistical Learning",
-        "url": ""
-      },
-      {
-        "text": "Книга — Глубокое обучение. Погружение в мир нейронных сетей",
-        "url": ""
-      },
-      {
-        "text": "Книга — Инженерия машинного обучения",
-        "url": ""
-      },
-      {
-        "text": "Книга — Книга: Deep Learning - Goodfellow, Bengio — https://www.deeplearningbook.org/",
-        "url": "https://www.deeplearningbook.org/"
-      },
-      {
-        "text": "Книга — Машинное обучение без лишних слов (The Hundred-Page ML Book)",
-        "url": ""
-      },
-      {
-        "text": "Курс — Coursera: Andrew Ng - Machine Learning — https://www.coursera.org/learn/machine-learning",
-        "url": "https://www.coursera.org/learn/machine-learning"
       }
     ]
   }

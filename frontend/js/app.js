@@ -610,6 +610,7 @@ class App {
             const text = (a.text || '').toLowerCase();
             if (text.includes('словарь терминов')) return false;
             if (text.includes('список ресурсов')) return false;
+            if (!a.type) return false;
             return true;
         });
         const seen = new Set();
@@ -622,24 +623,21 @@ class App {
         });
 
         // Group by type
-        const byType = { '70': [], '20': [], '10': [], 'other': [] };
+        const byType = { '70': [], '20': [], '10': [] };
         levelActionsDeduped.forEach(action => {
             const type = action.type || 'other';
             if (byType[type]) {
                 byType[type].push(action);
-            } else {
-                byType.other.push(action);
             }
         });
 
         const typeMeta = {
             '70': { title: '70% Обучение на практике', className: 'action-list-70' },
             '20': { title: '20% Развитие на рабочем месте', className: 'action-list-20' },
-            '10': { title: '10% Обучение и саморазвитие', className: 'action-list-10' },
-            'other': { title: 'Дополнительные действия', className: 'action-list-other' }
+            '10': { title: '10% Обучение и саморазвитие', className: 'action-list-10' }
         };
 
-        const order = ['70', '20', '10', 'other'];
+        const order = ['70', '20', '10'];
         const html = order
             .filter(type => byType[type].length > 0)
             .map(type => `

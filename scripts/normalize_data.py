@@ -27,12 +27,25 @@ def normalize_key(text):
     text = re.sub(r'[-\s]+', '_', text)
     return text.strip('_')
 
-def find_best_match(comp_name, comp_list, threshold=0.7):
+ALIASES = {
+    # PPT name -> Excel name (normalized)
+    "формирование_корпоративной_цифровой_архитектуры": "развитие_корпоративной_цифровой_архитектуры"
+}
+
+def apply_alias(comp_key: str) -> str:
+    if not comp_key:
+        return comp_key
+    for alias_key, target_key in ALIASES.items():
+        if comp_key == alias_key or comp_key.startswith(alias_key):
+            return target_key
+    return comp_key
+
+def find_best_match(comp_name, comp_key, comp_list, threshold=0.8):
     """Find best matching competency from list."""
     best_match = None
     best_score = 0
     
-    comp_key = normalize_key(comp_name)
+    comp_key = comp_key or normalize_key(comp_name)
     
     for comp in comp_list:
         comp_id = comp.get("id") or normalize_key(comp.get("name", ""))
@@ -76,22 +89,38 @@ def merge_data(model_data, actions_data):
     # Match actions to competencies
     matched_count = 0
     unmatched_actions = []
+    actions_by_comp_id = {}
     
     for action_key, action_data in actions_data.items():
         comp_name = action_data.get("competency_name", "")
         
+        comp_key = apply_alias(normalize_key(comp_name) or action_key)
         # Try to find matching competency
-        best_match, score = find_best_match(comp_name, model_data.get("competencies", []))
+        best_match, score = find_best_match(
+            comp_name,
+            comp_key,
+            model_data.get("competencies", [])
+        )
         
         if best_match and best_match in comp_lookup:
-            # Add actions to competency
-            comp = comp_lookup[best_match].copy()
-            comp["actions"] = {
+            # Collect actions to attach later (preserve model order)
+            existing = actions_by_comp_id.get(best_match)
+            payload = {
                 "by_level": action_data.get("actions_by_level", {}),
                 "by_type": action_data.get("actions_by_type", {}),
                 "all": action_data.get("all_actions", [])
             }
-            merged["competencies"].append(comp)
+            if existing:
+                # Merge in case of duplicate matches
+                for level_key, actions in payload["by_level"].items():
+                    existing["by_level"].setdefault(level_key, [])
+                    existing["by_level"][level_key].extend(actions)
+                for type_key, actions in payload["by_type"].items():
+                    existing["by_type"].setdefault(type_key, [])
+                    existing["by_type"][type_key].extend(actions)
+                existing["all"].extend(payload["all"])
+            else:
+                actions_by_comp_id[best_match] = payload
             matched_count += 1
         else:
             # Keep unmatched for manual review
@@ -104,17 +133,15 @@ def merge_data(model_data, actions_data):
             })
             print(f"  Warning: Could not match '{comp_name}' (best: {best_match}, score: {score:.2f})")
     
-    # Add competencies without actions
-    matched_ids = {comp["id"] for comp in merged["competencies"]}
+    # Add competencies in original model order
     for comp in model_data.get("competencies", []):
-        if comp["id"] not in matched_ids:
-            comp_copy = comp.copy()
-            comp_copy["actions"] = {
-                "by_level": {},
-                "by_type": {"70": [], "20": [], "10": []},
-                "all": []
-            }
-            merged["competencies"].append(comp_copy)
+        comp_copy = comp.copy()
+        comp_copy["actions"] = actions_by_comp_id.get(comp["id"], {
+            "by_level": {},
+            "by_type": {"70": [], "20": [], "10": []},
+            "all": []
+        })
+        merged["competencies"].append(comp_copy)
     
     # Save unmatched for review (write empty list when none)
     unmatched_path = Path(__file__).parent.parent / "frontend" / "data" / "unmatched_actions.json"

@@ -29,6 +29,8 @@ def analyze_sheet(ws, max_rows=50, max_cols=20):
 
 def main():
     excel_path = Path(__file__).parent.parent / "data-src" / "model.xlsx"
+    if not excel_path.exists():
+        excel_path = Path(__file__).parent.parent / "data" / "Модель_цифровых_компетенций.xlsx"
     
     if not excel_path.exists():
         print(f"Error: Excel file not found at {excel_path}")
