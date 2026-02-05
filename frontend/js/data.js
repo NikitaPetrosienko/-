@@ -3,8 +3,6 @@
  * Handles loading and caching of JSON data
  */
 
-const DATA_CACHE_KEY = 'appDataCache_v2';
-
 class DataManager {
     constructor() {
         this.data = null;
@@ -27,19 +25,6 @@ class DataManager {
             return this.data;
         }
 
-        // Try cached data first (static content, safe to reuse)
-        const cached = localStorage.getItem(DATA_CACHE_KEY);
-        if (cached) {
-            try {
-                this.data = JSON.parse(cached);
-                this.buildIndexes();
-                return this.data;
-            } catch (error) {
-                console.warn('Failed to parse cached data, refetching:', error);
-                localStorage.removeItem(DATA_CACHE_KEY);
-            }
-        }
-
         this.loading = true;
         try {
             const response = await fetch('data/data.json');
@@ -48,7 +33,6 @@ class DataManager {
             }
             this.data = await response.json();
             this.buildIndexes();
-            localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(this.data));
             return this.data;
         } catch (error) {
             console.error('Error loading data:', error);

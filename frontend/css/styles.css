@@ -870,6 +870,18 @@ body,
     gap: 10px;
 }
 
+.resources-modal-list .resource-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.resources-modal-list .resource-link {
+    color: var(--color-blue);
+    text-decoration: none;
+    flex: 1;
+}
+
 .resources-modal-list a {
     color: var(--color-blue);
     text-decoration: none;
@@ -877,6 +889,99 @@ body,
 
 .resources-modal-list a:hover {
     text-decoration: underline;
+}
+
+.qr-btn {
+    border: 1px solid var(--color-gray-light);
+    background: var(--color-white);
+    color: var(--color-gray-1);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.qr-btn:hover {
+    border-color: var(--color-blue);
+    color: var(--color-blue);
+    box-shadow: 0 2px 8px rgba(0, 103, 178, 0.2);
+}
+
+.qr-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='1' width='5' height='5' fill='currentColor'/%3E%3Crect x='10' y='1' width='5' height='5' fill='currentColor'/%3E%3Crect x='1' y='10' width='5' height='5' fill='currentColor'/%3E%3Crect x='7' y='7' width='2' height='2' fill='currentColor'/%3E%3Crect x='10' y='10' width='2' height='2' fill='currentColor'/%3E%3C/svg%3E");
+}
+
+.modal-content.modal-qr {
+    max-width: 920px;
+}
+
+.qr-modal-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.qr-modal-code {
+    border: 1px solid var(--color-gray-light);
+    border-radius: 10px;
+    padding: 12px;
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#qr-image {
+    width: 100%;
+    height: auto;
+    max-width: 300px;
+}
+
+.qr-modal-label {
+    font-weight: 600;
+    color: var(--color-gray-1);
+    margin-bottom: 6px;
+}
+
+.qr-modal-link {
+    word-break: break-all;
+    color: var(--color-gray-2);
+    margin-bottom: 14px;
+}
+
+.qr-open-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 103, 178, 0.25);
+    color: var(--color-blue);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.qr-open-link:hover {
+    border-color: var(--color-blue);
+    background: rgba(0, 103, 178, 0.08);
+}
+
+@media (max-width: 720px) {
+    .qr-modal-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Glossary Modal */

@@ -181,6 +181,31 @@
         </div>
     </div>
 
+    <!-- QR Modal -->
+    <div id="modal-qr" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-qr">
+            <div class="modal-header">
+                <h2>QR-код</h2>
+                <button class="modal-close" id="btn-close-qr">&times;</button>
+            </div>
+            <div class="modal-body qr-modal-body">
+                <div class="qr-modal-grid">
+                    <div class="qr-modal-code">
+                        <img id="qr-image" alt="QR-код" />
+                    </div>
+                    <div class="qr-modal-details">
+                        <div class="qr-modal-label">Ссылка</div>
+                        <div id="qr-link-text" class="qr-modal-link"></div>
+                        <div class="qr-modal-actions">
+                            <a id="qr-open-link" class="qr-open-link" href="#" target="_blank" rel="noopener">Открыть ссылку</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/router.js"></script>
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>

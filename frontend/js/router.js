@@ -41,6 +41,13 @@ class Router {
             route = 'category';
         } else if (hash.startsWith('/model')) {
             route = 'model';
+            params = this.parseQueryParams(hash);
+            if (!params.categoryId) {
+                const parts = hash.split('/').filter(p => p && !p.includes('?'));
+                if (parts.length > 1) {
+                    params.categoryId = parts[1];
+                }
+            }
         } else if (hash.startsWith('/competency')) {
             route = 'competency';
             // Parse query params: #/competency?key=xxx&level=3
@@ -59,18 +66,6 @@ class Router {
                     if (parts.length > 2) {
                         params.categoryId = parts[2];
                     }
-                }
-            }
-        }
-
-        // Check localStorage for initial route
-        if (route === 'category') {
-            const savedCategory = localStorage.getItem('selectedCategoryId');
-            if (savedCategory) {
-                route = 'model';
-                params.categoryId = savedCategory;
-                if (!hash || hash === '' || hash === '/category') {
-                    window.location.hash = '#/model';
                 }
             }
         }
@@ -105,8 +100,7 @@ class Router {
             case 'model':
                 hash = '#/model';
                 if (params.categoryId) {
-                    // Store in localStorage
-                    localStorage.setItem('selectedCategoryId', params.categoryId);
+                    hash += `?categoryId=${encodeURIComponent(params.categoryId)}`;
                 }
                 break;
             case 'competency':
@@ -117,7 +111,6 @@ class Router {
                     hash += `&level=${encodeURIComponent(level)}`;
                 }
                 if (params.categoryId) {
-                    localStorage.setItem('selectedCategoryId', params.categoryId);
                     hash += `&categoryId=${encodeURIComponent(params.categoryId)}`;
                 }
                 break;

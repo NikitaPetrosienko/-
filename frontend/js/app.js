@@ -16,12 +16,18 @@ class App {
         this.isRendering = false;
         this.currentClusterResources = [];
         this.currentClusterName = '';
+        this.metricsSessionId = this.generateSessionId();
+        this.screenTimer = { screen: null, startedAt: null };
+        this.glossarySearchTimer = null;
+        this.lastGlossaryQuery = '';
+        this.currentQrUrl = '';
 
         // Stable handlers to avoid re-binding on each render
         this.onBlockClick = this.onBlockClick.bind(this);
         this.onClusterClick = this.onClusterClick.bind(this);
         this.onCompetencyClick = this.onCompetencyClick.bind(this);
         this.onLevelSwitchClick = this.onLevelSwitchClick.bind(this);
+        this.onResourceClick = this.onResourceClick.bind(this);
     }
 
     async init() {
@@ -30,24 +36,9 @@ class App {
             await this.dataManager.load();
             await this.dataManager.loadResources();
             
-            // Load saved state
-            const savedCategory = localStorage.getItem('selectedCategoryId');
-            if (savedCategory) {
-                this.selectedCategory = savedCategory;
-            }
-
-            const savedBlock = sessionStorage.getItem('selectedBlockId');
-            if (savedBlock) {
-                this.selectedBlock = savedBlock;
-            }
-
-            const savedCluster = sessionStorage.getItem('selectedClusterId');
-            if (savedCluster) {
-                this.selectedCluster = savedCluster;
-            }
-            
             // Setup event listeners (for static elements only)
             this.setupEventListeners();
+            this.setupMetrics();
             
             // Initialize router and set up route change handler
             this.router.onRouteChange((route, params) => {
@@ -72,7 +63,6 @@ class App {
             const btn = document.getElementById(id);
             if (btn) {
                 btn.addEventListener('click', () => {
-                    localStorage.removeItem('selectedCategoryId');
                     this.selectedCategory = null;
                     this.router.navigate('category');
                 });
@@ -128,6 +118,11 @@ class App {
             closeHelp.addEventListener('click', () => this.closeHelpModal());
         }
 
+        const closeQr = document.getElementById('btn-close-qr');
+        if (closeQr) {
+            closeQr.addEventListener('click', () => this.closeQrModal());
+        }
+
         // Close modals on overlay click
         const glossaryModal = document.getElementById('modal-glossary');
         if (glossaryModal) {
@@ -156,13 +151,145 @@ class App {
             });
         }
 
+        const qrModal = document.getElementById('modal-qr');
+        if (qrModal) {
+            qrModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    this.closeQrModal();
+                }
+            });
+        }
+
         // Glossary search
         const glossarySearch = document.getElementById('glossary-search-input');
         if (glossarySearch) {
             glossarySearch.addEventListener('input', (e) => {
-                this.filterGlossary(e.target.value);
+                this.onGlossarySearchInput(e.target.value);
             });
         }
+    }
+
+    setupMetrics() {
+        window.addEventListener('beforeunload', () => {
+            this.flushScreenTimer();
+        });
+    }
+
+    generateSessionId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID();
+        }
+        return `sess_${Math.random().toString(36).slice(2)}${Date.now()}`;
+    }
+
+    track(event, payload = {}) {
+        const data = {
+            event,
+            ts: new Date().toISOString(),
+            session_id: this.metricsSessionId,
+            ...payload
+        };
+
+        if (!Object.prototype.hasOwnProperty.call(payload, 'screen')) {
+            const currentRoute = this.router?.getCurrentRoute?.();
+            if (currentRoute) {
+                data.screen = currentRoute;
+            }
+        }
+
+        const body = JSON.stringify(data);
+        try {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('/metrics', new Blob([body], { type: 'application/json' }));
+            } else {
+                fetch('/metrics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body,
+                    keepalive: true
+                });
+            }
+        } catch (error) {
+            if (DEBUG) console.warn('[App] Metrics отправка не удалась', error);
+        }
+    }
+
+    trackScreenChange(route) {
+        if (!route || this.screenTimer.screen === route) return;
+
+        this.flushScreenTimer();
+        this.screenTimer = { screen: route, startedAt: performance.now() };
+        this.track('screen_view', { screen: route });
+    }
+
+    flushScreenTimer() {
+        if (!this.screenTimer.screen || this.screenTimer.startedAt === null) return;
+        const durationMs = Math.max(0, Math.round(performance.now() - this.screenTimer.startedAt));
+        this.track('time_on_screen', {
+            screen: this.screenTimer.screen,
+            duration_ms: durationMs
+        });
+    }
+
+    onGlossarySearchInput(value) {
+        this.filterGlossary(value);
+        this.scheduleGlossarySearchMetric(value);
+    }
+
+    scheduleGlossarySearchMetric(value) {
+        const normalized = (value || '').trim().toLowerCase();
+        if (normalized.length < 2) return;
+        if (normalized === this.lastGlossaryQuery) return;
+
+        if (this.glossarySearchTimer) {
+            clearTimeout(this.glossarySearchTimer);
+        }
+
+        this.glossarySearchTimer = setTimeout(() => {
+            this.lastGlossaryQuery = normalized;
+            this.track('glossary_search', { query: normalized });
+        }, 400);
+    }
+
+    isExternalUrl(url) {
+        return /^https?:\/\//i.test(url || '');
+    }
+
+    openQrModal(url, text) {
+        const modal = document.getElementById('modal-qr');
+        const img = document.getElementById('qr-image');
+        const linkText = document.getElementById('qr-link-text');
+        const openLink = document.getElementById('qr-open-link');
+
+        if (!modal || !img || !linkText || !openLink) return;
+
+        this.currentQrUrl = url;
+        img.src = `/qr?url=${encodeURIComponent(url)}`;
+        linkText.textContent = text || url;
+        openLink.href = url;
+
+        modal.classList.add('active');
+    }
+
+    closeQrModal() {
+        const modal = document.getElementById('modal-qr');
+        const img = document.getElementById('qr-image');
+        if (img) img.src = '';
+        if (modal) modal.classList.remove('active');
+    }
+
+    onResourceClick(e) {
+        const btn = e.target.closest('.qr-btn');
+        const link = e.target.closest('.resource-link');
+        const target = btn || link;
+        if (!target) return;
+
+        const url = target.dataset.resourceUrl;
+        if (!url) return;
+
+        e.preventDefault();
+        const text = target.dataset.resourceText || '';
+        this.openQrModal(url, text);
     }
 
     async handleRouteChange(route, params) {
@@ -175,6 +302,7 @@ class App {
 
         try {
             if (DEBUG) console.log('[App] Handling route:', route, params);
+            this.trackScreenChange(route);
 
             switch (route) {
                 case 'category':
@@ -252,6 +380,7 @@ class App {
                 const categoryId = card.dataset.categoryId;
                 if (categoryId) {
                     if (DEBUG) console.log('[App] Category clicked:', categoryId);
+                    this.track('category_select', { category_id: categoryId });
                     this.router.navigate('model', { categoryId });
                 }
             }
@@ -322,7 +451,6 @@ class App {
         // Set first block as active if none selected
         if (!this.selectedBlock && blocks.length > 0) {
             this.selectedBlock = blocks[0].id;
-            sessionStorage.setItem('selectedBlockId', blocks[0].id);
             const firstBtn = blocksContainer.querySelector('.block-btn');
             if (firstBtn) {
                 firstBtn.classList.add('active');
@@ -361,7 +489,6 @@ class App {
                 if (item) {
                     const clusterId = item.dataset.clusterId;
                     this.selectedCluster = clusterId;
-                    sessionStorage.setItem('selectedClusterId', clusterId);
                     
                     // Update active state
                     containerEl.querySelectorAll('.cluster-item').forEach(i => i.classList.remove('active'));
@@ -403,7 +530,6 @@ class App {
         // Set first cluster as active if none selected
         if (!this.selectedCluster && filteredClusters.length > 0) {
             this.selectedCluster = filteredClusters[0].id;
-            sessionStorage.setItem('selectedClusterId', filteredClusters[0].id);
             const firstItem = container?.querySelector('.cluster-item');
             if (firstItem) {
                 firstItem.classList.add('active');
@@ -503,7 +629,6 @@ class App {
         // Remember active cluster before rendering sidebar
         if (competency.cluster_id) {
             this.selectedCluster = competency.cluster_id;
-            sessionStorage.setItem('selectedClusterId', competency.cluster_id);
         }
 
         // Render clusters sidebar for detail view (compact, only active cluster)
@@ -672,6 +797,7 @@ class App {
         if (modal) {
             modal.classList.add('active');
             this.renderGlossary();
+            this.track('glossary_open');
         }
     }
 
@@ -686,6 +812,7 @@ class App {
         const modal = document.getElementById('modal-help');
         if (modal) {
             modal.classList.add('active');
+            this.track('help_open');
         }
     }
 
@@ -713,14 +840,37 @@ class App {
                 <ol class="resources-modal-ol">
                     ${this.currentClusterResources.map(res => `
                         <li>
-                            ${res.url ? `<a href="${this.escapeHtml(res.url)}" target="_blank">${this.escapeHtml(res.text)}</a>` : this.escapeHtml(res.text)}
+                            ${res.url && this.isExternalUrl(res.url)
+                                ? `<div class="resource-item">
+                                        <a class="resource-link" href="${this.escapeHtml(res.url)}" target="_blank" rel="noopener"
+                                           data-resource-url="${this.escapeHtml(res.url)}"
+                                           data-resource-text="${this.escapeHtml(res.text)}">
+                                            ${this.escapeHtml(res.text)}
+                                        </a>
+                                        <button class="qr-btn" type="button"
+                                            data-resource-url="${this.escapeHtml(res.url)}"
+                                            data-resource-text="${this.escapeHtml(res.text)}"
+                                            aria-label="Показать QR-код">
+                                            <span class="qr-icon" aria-hidden="true"></span>
+                                        </button>
+                                   </div>`
+                                : this.escapeHtml(res.text)}
                         </li>
                     `).join('')}
                 </ol>
             `;
         }
 
+        if (!list.dataset.bound) {
+            list.addEventListener('click', this.onResourceClick);
+            list.dataset.bound = '1';
+        }
+
         modal.classList.add('active');
+        this.track('resources_open', {
+            cluster_id: this.selectedCluster || null,
+            category_id: this.selectedCategory || null
+        });
     }
 
     closeResourcesModal() {
@@ -804,7 +954,10 @@ class App {
         if (!blockId) return;
 
         this.selectedBlock = blockId;
-        sessionStorage.setItem('selectedBlockId', blockId);
+        this.track('block_select', {
+            block_id: blockId,
+            category_id: this.selectedCategory || null
+        });
 
         // Update active state
         const blocksContainer = document.getElementById('blocks-selector');
@@ -813,7 +966,6 @@ class App {
 
         // Reset cluster selection
         this.selectedCluster = null;
-        sessionStorage.removeItem('selectedClusterId');
 
         // Re-render clusters and competencies
         this.renderClusters(this.selectedCategory);
@@ -827,7 +979,12 @@ class App {
         if (!clusterId) return;
 
         this.selectedCluster = clusterId;
-        sessionStorage.setItem('selectedClusterId', clusterId);
+
+        this.track('cluster_select', {
+            cluster_id: clusterId,
+            block_id: this.selectedBlock || null,
+            category_id: this.selectedCategory || null
+        });
 
         // Update active state for both lists
         document.querySelectorAll('.cluster-item').forEach(i => i.classList.remove('active'));
@@ -852,6 +1009,11 @@ class App {
         if (!competencyId) return;
 
         if (DEBUG) console.log('[App] Competency clicked:', competencyId);
+        this.track('competency_open', {
+            competency_id: competencyId,
+            cluster_id: this.selectedCluster || null,
+            category_id: this.selectedCategory || null
+        });
         this.router.navigate('competency', { 
             key: competencyId,
             categoryId: this.selectedCategory
@@ -863,10 +1025,17 @@ class App {
         const btn = e.target.closest('.level-switch-btn');
         if (!btn) return;
         const level = parseInt(btn.dataset.level);
-        
+
         // Update active state
         container.querySelectorAll('.level-switch-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+
+        this.track('level_switch', {
+            competency_id: this.currentCompetency?.id || this.router.getParams()?.key || null,
+            level,
+            cluster_id: this.selectedCluster || null,
+            category_id: this.selectedCategory || null
+        });
         
         // Update URL without triggering full re-render
         const params = this.router.getParams();
